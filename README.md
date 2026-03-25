@@ -157,6 +157,18 @@ cp output/{name}/agents/{name}.md ~/.claude/agents/{name}.md
 cp -r output/{name}/agent-memory/{name} ~/.claude/agent-memory/{name}
 ```
 
+> **MEMORY.md について**
+> `output/{name}/agent-memory/{name}/MEMORY.md` はエージェントの初期作業記憶。
+> マスターとの共有記憶（プロジェクト・人物・ルール等）は全エージェント共通なので、
+> `~/workspace/MEMORY.md` をそのままコピーするのが最も手軽。
+>
+> ```bash
+> cp ~/workspace/MEMORY.md output/{name}/agent-memory/{name}/MEMORY.md
+> ```
+>
+> エージェント固有の記憶（性格・役割・スキル等）は SOUL.md に記載するため、
+> MEMORY.md は共有ベースで運用してよい。
+
 ---
 
 ## 対応エージェント
