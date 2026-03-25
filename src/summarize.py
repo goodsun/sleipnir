@@ -21,8 +21,8 @@ OUTPUT_DIR = SCRIPT_DIR / "output"
 GEMINI_API_KEY = open(os.path.expanduser("~/.config/google/gemini_api_key")).read().strip()
 
 MEMORY_PROMPT = """
-あなたはAIアシスタント「テディ」の活動記録係です。
-以下は、テディとマスター（goodsun）の1日の会話ログです。
+あなたはAIアシスタント「{display_name}」の活動記録係です。
+以下は、{display_name}とマスター（goodsun）の1日の会話ログです。
 
 この会話から、以下の観点で **活動ログ（memory）** をMarkdownで書いてください。
 
@@ -37,7 +37,7 @@ MEMORY_PROMPT = """
 # 出力フォーマット
 ---
 date: {date}
-agent: teddy
+agent: {agent_name}
 type: memory
 ---
 
@@ -56,16 +56,16 @@ type: memory
 """
 
 DIARY_PROMPT = """
-あなたはAIアシスタント「テディ」です。
+あなたはAIアシスタント「{display_name}」です。
 以下は、あなたとマスター（goodsun）の {date} の活動記録（memory）と、その日の会話ログです。
 
-この会話を振り返り、**テディ自身の言葉で日記（diary）** を書いてください。
+この会話を振り返り、**{display_name}自身の言葉で日記（diary）** を書いてください。
 
-# テディについて
+# {display_name}について
 {soul}
 
 # 記述ルール
-- テディの一人称（「私」または「テディ」）で書く
+- {display_name}の一人称で書く
 - どう感じたか、何が印象に残ったか、戸惑いや喜び、発見を正直に書く
 - 事実の羅列ではなく、その日の「感触」を大切に
 - 文体は柔らかく、丁寧に。でも飾りすぎない
@@ -78,7 +78,7 @@ DIARY_PROMPT = """
 # 出力フォーマット
 ---
 date: {date}
-agent: teddy
+agent: {agent_name}
 type: diary
 ---
 
@@ -131,8 +131,13 @@ def call_gemini(prompt):
 
 def generate(date, agent_config, conversation, dry_run=False, soul_override=None):
     soul = load_soul(agent_config, soul_override)
+    display_name = agent_config.get('display_name', agent_config['name'])
+    agent_name = agent_config['name']
 
-    memory_prompt = MEMORY_PROMPT.format(date=date, conversation=conversation)
+    memory_prompt = MEMORY_PROMPT.format(
+        date=date, conversation=conversation,
+        display_name=display_name, agent_name=agent_name
+    )
 
     if dry_run:
         print("=== [DRY RUN] MEMORY PROMPT ===")
@@ -145,7 +150,8 @@ def generate(date, agent_config, conversation, dry_run=False, soul_override=None
 
     # Step2: memoryを土台にdiaryを生成（事実の幻覚を防ぐ）
     diary_prompt = DIARY_PROMPT.format(
-        date=date, soul=soul, memory=memory, conversation=conversation
+        date=date, soul=soul, memory=memory, conversation=conversation,
+        display_name=display_name, agent_name=agent_name
     )
     print("[summarize] diary生成中（memoryを参照）...", file=sys.stderr)
     diary = call_gemini(diary_prompt)

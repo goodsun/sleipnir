@@ -2,8 +2,15 @@
   "agents": [
     {
       "name": "teddy",
+      "display_name": "テディ",
       "sessions_dir": "/Users/teddy/.openclaw/agents/main/sessions",
       "soul_file": "output/teddy/agents/teddy.md"
+    },
+    {
+      "name": "mephi",
+      "display_name": "メフィ",
+      "sessions_dir": "/Users/mephi/.openclaw/agents/main/sessions",
+      "soul_file": "output/mephi/agents/mephi.md"
     }
   ]
 }
