@@ -91,7 +91,7 @@ for date in $DATES; do
 
   # 生成
   START=$(date +%s)
-  python3 "$SCRIPT_DIR/src/summarize.py" --date "$date" --agent "$AGENT" > /dev/null 2>&1
+  /home/alice/tools/sleipnir/.venv/bin/python "$SCRIPT_DIR/src/summarize.py" --date "$date" --agent "$AGENT" > /dev/null 2>&1
   EXIT_CODE=$?
   END=$(date +%s)
   ELAPSED=$((END - START))
