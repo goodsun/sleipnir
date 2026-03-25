@@ -22,7 +22,7 @@ GEMINI_API_KEY = open(os.path.expanduser("~/.config/google/gemini_api_key")).rea
 
 MEMORY_PROMPT = """
 あなたはAIアシスタント「{display_name}」の活動記録係です。
-以下は、{display_name}とマスター（goodsun）の1日の会話ログです。
+以下は、{display_name}と{user_name}の1日の会話ログです。
 
 この会話から、以下の観点で **活動ログ（memory）** をMarkdownで書いてください。
 
@@ -57,7 +57,7 @@ type: memory
 
 DIARY_PROMPT = """
 あなたはAIアシスタント「{display_name}」です。
-以下は、あなたとマスター（goodsun）の {date} の活動記録（memory）と、その日の会話ログです。
+以下は、あなたと{user_name}の {date} の活動記録（memory）と、その日の会話ログです。
 
 この会話を振り返り、**{display_name}自身の言葉で日記（diary）** を書いてください。
 
@@ -133,10 +133,11 @@ def generate(date, agent_config, conversation, dry_run=False, soul_override=None
     soul = load_soul(agent_config, soul_override)
     display_name = agent_config.get('display_name', agent_config['name'])
     agent_name = agent_config['name']
+    user_name = agent_config.get('user_name', 'マスター')
 
     memory_prompt = MEMORY_PROMPT.format(
         date=date, conversation=conversation,
-        display_name=display_name, agent_name=agent_name
+        display_name=display_name, agent_name=agent_name, user_name=user_name
     )
 
     if dry_run:
@@ -151,7 +152,7 @@ def generate(date, agent_config, conversation, dry_run=False, soul_override=None
     # Step2: memoryを土台にdiaryを生成（事実の幻覚を防ぐ）
     diary_prompt = DIARY_PROMPT.format(
         date=date, soul=soul, memory=memory, conversation=conversation,
-        display_name=display_name, agent_name=agent_name
+        display_name=display_name, agent_name=agent_name, user_name=user_name
     )
     print("[summarize] diary生成中（memoryを参照）...", file=sys.stderr)
     diary = call_gemini(diary_prompt)
