@@ -11,6 +11,12 @@
       "display_name": "メフィ",
       "sessions_dir": "/Users/mephi/.openclaw/agents/main/sessions",
       "soul_file": "output/mephi/agents/mephi.md"
+    },
+    {
+      "name": "akiko",
+      "display_name": "彰子",
+      "sessions_dir": "/home/bizeny/.openclaw/agents/main/sessions",
+      "soul_file": "output/akiko/agents/akiko.md"
     }
   ]
 }

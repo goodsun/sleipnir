@@ -164,6 +164,7 @@ cp -r output/{name}/agent-memory/{name} ~/.claude/agent-memory/{name}
 | name | sessions_dir | 状態 |
 |------|-------------|------|
 | teddy | `/Users/teddy/.openclaw/agents/main/sessions` | ✅ MVP完成 |
+| akiko | `/home/bizeny/.openclaw/agents/main/sessions` | 🔧 設定済み・未実行 |
 
 ---
 
