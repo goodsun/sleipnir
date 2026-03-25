@@ -9,7 +9,7 @@
     {
       "name": "mephi",
       "display_name": "メフィ",
-      "sessions_dir": "/Users/mephi/.openclaw/agents/main/sessions",
+      "sessions_dir": "/home/mephi/.openclaw/agents/main/sessions",
       "soul_file": "output/mephi/agents/mephi.md"
     }
   ]
