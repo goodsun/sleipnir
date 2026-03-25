@@ -11,6 +11,12 @@
       "display_name": "メフィ",
       "sessions_dir": "/Users/mephi/.openclaw/agents/main/sessions",
       "soul_file": "output/mephi/agents/mephi.md"
+    },
+    {
+      "name": "jasmine",
+      "display_name": "Jasmine（ジャスミン）",
+      "sessions_dir": "/Users/jasmine/.openclaw/agents/main/sessions",
+      "soul_file": "output/jasmine/agents/jasmine.md"
     }
   ]
 }
