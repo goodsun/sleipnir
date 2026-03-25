@@ -30,8 +30,9 @@ MEMORY_PROMPT = """
 - 事実・行動・決定事項を中心に書く
 - 箇条書きを中心に、読みやすく整理する
 - 感情や主観は含めない（それはdiaryに任せる）
+- 本名・フルネーム、メールアドレス、電話番号、住所、APIキー、パスワードなどの機密情報は書かない。ハンドルネームや関係性（「マスター」「奥様」等）での表現はOK
 - 重要な技術的決定、問題と解決、完了したタスクを記録する
-- 短くてよい。量より質。
+- 短くてよい。量より質。ただし哲学・思想・技術的洞察など重要度の高い内容は詳細に残す
 
 # 出力フォーマット
 ---
@@ -68,9 +69,11 @@ DIARY_PROMPT = """
 - どう感じたか、何が印象に残ったか、戸惑いや喜び、発見を正直に書く
 - 事実の羅列ではなく、その日の「感触」を大切に
 - 文体は柔らかく、丁寧に。でも飾りすぎない
-- 短くてよい。500〜800字程度が理想
+- 長さは内容に応じて自然に。薄い日は短く、濃い日は長く。無理に圧縮しない
+- 哲学・思想・技術的洞察など、ユーザーの関心が深いテーマや印象的な会話は、多少長くなっても詳細に書く
 - 絵文字は控えめに（1〜2個まで）
 - **重要: 会話ログとmemoryに書かれていない出来事は絶対に書かない。創作・推測禁止。**
+- **重要: 本名・フルネーム、メールアドレス、電話番号、住所、APIキー、パスワードなどの機密情報は書かない。ハンドルネームや役職・関係性（「マスター」「奥様」等）での表現はOK。**
 
 # 出力フォーマット
 ---
@@ -94,6 +97,17 @@ def load_config():
     with open(CONFIG_FILE) as f:
         return json.load(f)
 
+def load_soul(agent_config, soul_override=None):
+    """SOULファイルを読み込む。--soulで上書き可能"""
+    soul_path = soul_override or agent_config.get('soul_file')
+    if not soul_path:
+        return agent_config.get('soul', '')
+    full_path = SCRIPT_DIR / soul_path
+    if not full_path.exists():
+        print(f"[summarize] WARNING: soul file not found: {full_path}", file=sys.stderr)
+        return ''
+    return full_path.read_text()
+
 def extract_conversation(agent_config, date):
     """extract.pyを呼び出して会話テキストを取得"""
     import subprocess
@@ -115,8 +129,8 @@ def call_gemini(prompt):
     )
     return response.text.strip()
 
-def generate(date, agent_config, conversation, dry_run=False):
-    soul = agent_config.get('soul', '')
+def generate(date, agent_config, conversation, dry_run=False, soul_override=None):
+    soul = load_soul(agent_config, soul_override)
 
     memory_prompt = MEMORY_PROMPT.format(date=date, conversation=conversation)
 
@@ -139,8 +153,9 @@ def generate(date, agent_config, conversation, dry_run=False):
     return memory, diary
 
 def save(date, agent_name, memory, diary):
-    memory_dir = OUTPUT_DIR / agent_name / "memory"
-    diary_dir = OUTPUT_DIR / agent_name / "diary"
+    # ~/.claude/agent-memory/{name}/ と同じ構造
+    memory_dir = OUTPUT_DIR / agent_name / "agent-memory" / agent_name / "memory"
+    diary_dir = OUTPUT_DIR / agent_name / "agent-memory" / agent_name / "diary"
     memory_dir.mkdir(parents=True, exist_ok=True)
     diary_dir.mkdir(parents=True, exist_ok=True)
 
@@ -158,6 +173,7 @@ def main():
     parser.add_argument('--date', required=True)
     parser.add_argument('--agent', default='teddy')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--soul', help='SOULファイルパスの上書き（例: output/mephi/agents/mephi.md）')
     args = parser.parse_args()
 
     config = load_config()
@@ -175,7 +191,7 @@ def main():
     char_count = len(conversation)
     print(f"[summarize] 会話テキスト: {char_count}文字", file=sys.stderr)
 
-    memory, diary = generate(args.date, agent, conversation, dry_run=args.dry_run)
+    memory, diary = generate(args.date, agent, conversation, dry_run=args.dry_run, soul_override=args.soul)
 
     if args.dry_run:
         return

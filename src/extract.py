@@ -73,42 +73,65 @@ def extract_messages(jsonl_path):
         pass
     return messages
 
-def extract_date(jsonl_path):
-    """セッションファイルの日付を取得"""
-    try:
-        with open(jsonl_path) as f:
-            first = json.loads(f.readline())
-        ts = first.get('timestamp', '')
-        return ts[:10] if ts else None
-    except:
-        return None
-
 def load_sessions_for_date(sessions_dir, target_date):
-    """指定日のセッションを全件読み込み、フィルタして返す"""
+    """指定日のメッセージをファイル横断で収集する。
+    メッセージのtimestampで日付を判定するため、
+    複数日にまたがるセッション（長期/コンパクション済み）にも対応。
+    """
     sessions_dir = Path(sessions_dir)
-    all_sessions = []
+    # target_dateのメッセージを全ファイルから収集
+    day_messages = []
 
     for fpath in sessions_dir.glob("*.jsonl"):
-        date = extract_date(fpath)
-        if date != target_date:
+        try:
+            with open(fpath) as f:
+                lines = f.readlines()
+        except:
             continue
-        messages = extract_messages(fpath)
-        if not messages:
-            continue
-        if is_heartbeat_session(messages):
-            continue
-        # userとassistant両方いるか
-        roles = {m['role'] for m in messages}
-        if 'user' not in roles or 'assistant' not in roles:
-            continue
-        all_sessions.append({
-            'file': fpath.name,
-            'messages': messages
-        })
 
-    # メッセージ数でソート（多い順）
-    all_sessions.sort(key=lambda x: len(x['messages']), reverse=True)
-    return all_sessions
+        for line in lines:
+            try:
+                d = json.loads(line.strip())
+            except:
+                continue
+            if d.get('type') != 'message':
+                continue
+            ts = d.get('timestamp', '')
+            if not ts.startswith(target_date):
+                continue
+            msg = d.get('message', {})
+            role = msg.get('role', '')
+            if role not in ('user', 'assistant'):
+                continue
+            content = msg.get('content', '')
+            if isinstance(content, list):
+                text = '\n'.join(
+                    c.get('text', '') for c in content
+                    if isinstance(c, dict) and c.get('type') == 'text'
+                ).strip()
+            else:
+                text = str(content).strip()
+            if not text:
+                continue
+            day_messages.append({
+                'role': role,
+                'text': text,
+                'timestamp': ts
+            })
+
+    if not day_messages:
+        return []
+
+    # timestampでソート
+    day_messages.sort(key=lambda x: x['timestamp'])
+
+    # 1日分を1セッションとして返す（heartbeatフィルタ）
+    filtered = [m for m in day_messages if not any(p in m['text'] for p in HEARTBEAT_PATTERNS)]
+    roles = {m['role'] for m in filtered}
+    if 'user' not in roles or 'assistant' not in roles:
+        return []
+
+    return [{'file': f'{target_date}(merged)', 'messages': filtered}]
 
 def format_conversation(sessions):
     """セッションリストを会話テキストに変換"""
