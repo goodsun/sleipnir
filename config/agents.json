@@ -3,14 +3,12 @@
     {
       "name": "teddy",
       "display_name": "テディ",
-      "user_name": "マスター（goodsun）",
       "sessions_dir": "/Users/teddy/.openclaw/agents/main/sessions",
       "soul_file": "output/teddy/agents/teddy.md"
     },
     {
       "name": "mephi",
       "display_name": "メフィ",
-      "user_name": "マスター（goodsun）",
       "sessions_dir": "/Users/mephi/.openclaw/agents/main/sessions",
       "soul_file": "output/mephi/agents/mephi.md"
     }
