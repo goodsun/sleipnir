@@ -17,6 +17,12 @@
       "display_name": "Jasmine（ジャスミン）",
       "sessions_dir": "/Users/jasmine/.openclaw/agents/main/sessions",
       "soul_file": "output/jasmine/agents/jasmine.md"
+    },
+    {
+      "name": "alice",
+      "display_name": "アリス",
+      "sessions_dir": "/home/alice/.openclaw/agents/main/sessions",
+      "soul_file": "output/alice/agents/alice.md"
     }
   ]
 }
