@@ -43,7 +43,9 @@ from collections import defaultdict
 sessions_dir = "$SESSIONS_DIR"
 dates = set()
 for fname in os.listdir(sessions_dir):
-    if not fname.endswith('.jsonl'):
+    if not (fname.endswith('.jsonl') or '.jsonl.' in fname):
+        continue
+    if fname.endswith('.lock') or fname.endswith('.tmp'):
         continue
     try:
         with open(os.path.join(sessions_dir, fname)) as f:

@@ -82,7 +82,12 @@ def load_sessions_for_date(sessions_dir, target_date):
     # target_dateのメッセージを全ファイルから収集
     day_messages = []
 
-    for fpath in sessions_dir.glob("*.jsonl"):
+    # .jsonl, .jsonl.reset.*, .jsonl.deleted.*, .jsonl.bak など全てのセッションファイルを対象にする
+    all_files = list(sessions_dir.glob("*.jsonl")) + list(sessions_dir.glob("*.jsonl.*"))
+    # .lock ファイルは除外
+    all_files = [f for f in all_files if not str(f).endswith('.lock') and not str(f).endswith('.tmp')]
+
+    for fpath in all_files:
         try:
             with open(fpath) as f:
                 lines = f.readlines()

@@ -23,6 +23,12 @@
       "display_name": "アリス",
       "sessions_dir": "/home/alice/.openclaw/agents/main/sessions",
       "soul_file": "output/alice/agents/alice.md"
+    },
+    {
+      "name": "akiko",
+      "display_name": "彰子",
+      "sessions_dir": "/home/bizeny/.openclaw/agents/main/sessions",
+      "soul_file": "output/akiko/agents/akiko.md"
     }
   ]
 }
