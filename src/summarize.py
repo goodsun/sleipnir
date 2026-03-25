@@ -124,7 +124,7 @@ def extract_conversation(agent_config, date):
 def call_gemini(prompt):
     client = genai_client.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=prompt
     )
     return response.text.strip()
